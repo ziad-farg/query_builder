@@ -17,7 +17,10 @@ class CategoryController extends Controller
      */
     public function index()
     {
+        // Retrieve categories from the 'categories' table, ordered by ID and paginated.
         $categories = DB::table('categories')->orderBy('id')->paginate(10);
+
+        // Pass the retrieved categories to the 'category.all' view.
         return view("category.all", compact("categories"));
     }
 
@@ -26,6 +29,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
+        // return the view of page add
         return view('category.add');
     }
 
@@ -41,7 +45,9 @@ class CategoryController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust the image validation rules as needed
         ]);
 
+        // checked if the validation is failed
         if ($validator->fails()) {
+            // return the message error in the page add
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
@@ -57,6 +63,8 @@ class CategoryController extends Controller
             'description' => $request->description,
             'image' => $image
         ]);
+
+        // when insert all input filed correct redirect to the main page
         return redirect()->route('category.index');
     }
 
@@ -65,7 +73,10 @@ class CategoryController extends Controller
      */
     public function show(string $id)
     {
+        // Retrieve the category from the 'categories' table based on the provided ID.
         $category = DB::table('categories')->where('id', $id)->first();
+
+        // Pass the retrieved category data to the 'category.delete' view.
         return view('category.delete', compact('category'));
     }
 
@@ -74,8 +85,10 @@ class CategoryController extends Controller
      */
     public function edit(string $id)
     {
-        // get data from database
+        // Retrieve the category from the 'categories' table based on the provided ID.
         $category = DB::table('categories')->where('id', $id)->first();
+
+        // Pass the retrieved category data to the 'category.edit' view.
         return view('category.edit', compact('category'));
     }
 
@@ -99,17 +112,23 @@ class CategoryController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Adjust the image validation rules as needed
         ]);
 
+        // Check if validation fails.
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        // If validation passes, handle the image upload and database update.
         $image = $request->image;
         $image = $image->store('image/category', 'public');
+
+        // Update the category in the 'categories' table based on the provided ID.
         DB::table('categories')->where('id', $id)->update([
             'name' => $request->name,
             'description' => $request->description,
             'image' => $image
         ]);
+
+        // Redirect to the 'category.index' route after successful update.
         return redirect()->route('category.index');
     }
 
@@ -118,11 +137,15 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
+        // Delete the category from the 'categories' table based on the provided ID.
         $deleted = DB::table('categories')->where('id', $id)->delete();
 
+        // Check if the deletion was successful.
         if ($deleted) {
+            // Redirect to the 'category.index' route after successful deletion.
             return redirect()->route('category.index');
         } else {
+            // Redirect to the 'category.index' route with an error message if deletion fails.
             return redirect()->route('category.index')->with('error', 'Failed to delete category.');
         }
     }

@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// to open directly project
 Route::redirect('/', '/category');
 
+// route of category
 Route::resource('category', CategoryController::class);
